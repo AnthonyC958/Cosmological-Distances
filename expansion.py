@@ -4,6 +4,14 @@ import scipy.integrate as sp
 
 
 def get_h_inv(z, om, ol):
+    """Integrand for calculating comoving distance.
+    Assumes the lower bound on redshift is 0.
+
+    Inputs:
+     z -- upper redshift bound
+     om -- matter density parameter
+     ol -- dark energy density parameter
+    """
     ok = 1.0 - om - ol
     h = np.sqrt(ok * (1 + z) ** 2 + om * (1 + z) ** 3 + ol)
     return 1. / h
