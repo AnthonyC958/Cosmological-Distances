@@ -47,7 +47,7 @@ def numerical_check(om, ol , z_arr):
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (Gpc)", fontsize=16)
-    ax.set_title("Calibration", fontsize=20)
+    ax.set_title("Comoving Check", fontsize=20)
     plt.show()
 
     fig = plt.figure()
@@ -57,7 +57,7 @@ def numerical_check(om, ol , z_arr):
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (Gpc)", fontsize=16)
-    ax.set_title("Calibration", fontsize=20)
+    ax.set_title("Proper Distance Check", fontsize=20)
     # fig.savefig("comoving.pdf", bbox_inches="tight")
     plt.show()
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         for j, z in enumerate(zs, start=0):
             dist_phi[i][j] = perp_phi(om, ol, z_arr, z, angle, phi_arr)
 
-    # numerical_check(om, ol, z_arr)
-    plot_parallel(z_arr, dist_para, comoving)
+    numerical_check(om, ol, z_arr)
+    # plot_parallel(z_arr, dist_para, comoving)
     plot_perp_thet(zs, theta_arr, dist_thet)
     plot_perp_phi(zs, phi_arr, dist_phi)
