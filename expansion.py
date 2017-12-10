@@ -3,7 +3,7 @@ import matplotlib, matplotlib.pyplot as plt
 import scipy.integrate as sp
 
 
-def get_h_inv(z, om, ol):
+def get_h_inv(z_val, matter_dp, lambda_dp):
     """Integrand for calculating comoving distance.
     Assumes the lower bound on redshift is 0.
 
@@ -12,37 +12,37 @@ def get_h_inv(z, om, ol):
      om -- matter density parameter
      ol -- dark energy density parameter
     """
-    ok = 1.0 - om - ol
-    h = np.sqrt(ok * (1 + z) ** 2 + om * (1 + z) ** 3 + ol)
+    curvature_dp = 1.0 - matter_dp - lambda_dp
+    h = np.sqrt(curvature_dp * (1 + z_val) ** 2 + matter_dp * (1 + z_val) ** 3 + lambda_dp)
     return 1. / h
 
 
-def parallel(om, ol, z_arr):
+def parallel(matter_dp, lambda_dp, zs_array):
     H0 = 70000  # km/s/Gpc
     c = 2.998e5  # km/s
-    h_invs = vecGet_h_inv(z_arr, om, ol)
-    ok = 1.0 - om - ol
-    comoving_coord = sp.cumtrapz(h_invs, x=z_arr, initial=0)
-    if ok == 0:
+    h_invs = vecGet_h_inv(zs_array, matter_dp, lambda_dp)
+    curvature_dp = 1.0 - matter_dp - lambda_dp
+    comoving_coord = sp.cumtrapz(h_invs, x=zs_array, initial=0)
+    if curvature_dp == 0:
         dist = comoving_coord * c / H0
-    elif ok > 0:
-        R0 = c / (H0 * np.sqrt(ok))
+    elif curvature_dp > 0:
+        R0 = c / (H0 * np.sqrt(curvature_dp))
         dist = R0 * np.sinh(comoving_coord / R0) * c / H0
     else:
-        R0 = c / (H0 * np.sqrt(-ok))
+        R0 = c / (H0 * np.sqrt(-curvature_dp))
         dist = R0 * np.sin(comoving_coord / R0) * c / H0
     return dist
 
 
-def numerical_check(om, ol, z_arr):
+def numerical_check(matter_dp, lambda_dp, zs_array):
     H0 = 70000
     c = 2.998e5
-    test_dist = parallel(om, ol, z_arr)
-    analytical_dist = -c / H0 * 2 * (1 / np.sqrt(z_arr + 1) - 1)  # om = 1, ol = 0
+    test_dist = parallel(matter_dp, lambda_dp, zs_array)
+    analytical_dist = -c / H0 * 2 * (1 / np.sqrt(zs_array + 1) - 1)  # om = 1, ol = 0
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(z_arr, test_dist, label="Numerical")
-    ax.plot(z_arr, analytical_dist, label="Analytical")
+    ax.plot(zs_array, test_dist, label="Numerical")
+    ax.plot(zs_array, analytical_dist, label="Analytical")
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (Gpc)", fontsize=16)
@@ -51,31 +51,31 @@ def numerical_check(om, ol, z_arr):
     plt.show()
 
 
-def perp_thet(om, ol, z_arr, z, theta_arr):
-    dist_par = parallel(om, ol, z_arr)
-    dist_para = dist_par[np.argmin(np.abs(z_arr - z))]
-    dist_thet = dist_para * theta_arr
-    return dist_thet
+def perp_thet(matter_dp, lambda_dp, zs_array, z_contour, thetas_array):
+    dists = parallel(matter_dp, lambda_dp, zs_array)
+    para = dists[np.argmin(np.abs(zs_array - z_contour))]
+    dist_final_theta = para * thetas_array
+    return dist_final_theta
 
 
-def perp_phi(om, ol, z_arr, z, theta, phi_arr):
-    dist_par = parallel(om, ol, z_arr)
-    dist_para = dist_par[np.argmin(np.abs(z_arr - z))]
-    dist_phi = dist_para * np.sin(theta) * phi_arr
-    return dist_phi
+def perp_phi(matter_dp, lambda_dp, zs_array, z_contour, theta, phis_array):
+    dists = parallel(matter_dp, lambda_dp, zs_array)
+    para = dists[np.argmin(np.abs(zs_array - z_contour))]
+    dist_final_phi = para * np.sin(theta) * phis_array
+    return dist_final_phi
 
 
-def plot_parallel(z_arr, dist_para, ok):
+def plot_parallel(zs_array, dist, curvature):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(z_arr, dist_para, label=r"$\Omega_m=%0.2f$" % om)
+    ax.plot(zs_array, dist, label=r"$\Omega_m=%0.2f$" % om)
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     plt.figtext(0.85, 0.6, "$\Omega_\Lambda=%0.2f$" % ol, ha='right', va='bottom', weight='roman', size='large')
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (Gpc)", fontsize=16)
-    if ok == 0:
+    if curvature == 0:
         ax.set_title("Parallel Distance (Flat Space)", fontsize=20)
-    elif ok < 0:
+    elif curvature < 0:
         ax.set_title("Parallel Distance (Negative Curved Space)", fontsize=20)
     else:
         ax.set_title("Parallel Distance (Positive Curved Space)", fontsize=20)
@@ -83,18 +83,18 @@ def plot_parallel(z_arr, dist_para, ok):
     plt.show()
 
 
-def plot_perp_thet(zs, theta_arr, dist_thet, ok):
-    colours = matplotlib.cm.rainbow(np.linspace(0, 1, zs.size))
+def plot_perp_thet(z_contours, thetas_array, dist, curvature):
+    colours = matplotlib.cm.rainbow(np.linspace(0, 1, z_contours.size))
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("$R\chi$ (Gpc)", fontsize=16)
-    for i, z in enumerate(zs, start=0):
-        ax.plot(theta_arr, dist_thet[i], label=f"$z={z}$", color=colours[i])
+    for num, contour in enumerate(z_contours, start=0):
+        ax.plot(thetas_array, dist[num], label=f"$z={contour}$", color=colours[num])
     ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
-    if ok == 0:
+    if curvature == 0:
         ax.set_title("$\\theta$ Perpendicular Distance (Flat Space)", fontsize=20)
-    elif ok < 0:
+    elif curvature < 0:
         ax.set_title("$\\theta$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
     else:
         ax.set_title("$\\theta$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
@@ -102,20 +102,20 @@ def plot_perp_thet(zs, theta_arr, dist_thet, ok):
     # fig.savefig("theta.pdf", bbox_inches="tight")
 
 
-def plot_perp_phi(zs, phi_arr, dist_phi, ok):
-    colours = matplotlib.cm.rainbow(np.linspace(0, 1, zs.size))
+def plot_perp_phi(z_contours, phis_array, dists, curvature):
+    colours = matplotlib.cm.rainbow(np.linspace(0, 1, z_contours.size))
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\phi$", fontsize=16)
     ax.set_ylabel("$R\chi\sin\\theta$ (Gpc)", fontsize=16)
-    for i, z in enumerate(zs, start=0):
-        ax.plot(phi_arr, dist_phi[0][i], label=f"$z={z}$", color=colours[i])
+    for num, contour in enumerate(z_contours, start=0):
+        ax.plot(phis_array, dists[0][num], label=f"$z={contour}$", color=colours[num])
     ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
-    for i, z in enumerate(zs, start=0):
-        ax.plot(phi_arr, dist_phi[1][i], label=f"$z={z}$", color=colours[i], linestyle="--")
-    if ok == 0:
+    for num, contour in enumerate(z_contours, start=0):
+        ax.plot(phis_array, dists[1][num], label=f"$z={contour}$", color=colours[num], linestyle="--")
+    if curvature == 0:
         ax.set_title("$\\phi$ Perpendicular Distance (Flat Space)", fontsize=20)
-    elif ok < 0:
+    elif curvature < 0:
         ax.set_title("$\\phi$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
     else:
         ax.set_title("$\\phi$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
@@ -152,6 +152,6 @@ if __name__ == "__main__":
             dist_phi[i][j] = perp_phi(om, ol, z_arr, z, angle, phi_arr)
 
     numerical_check(om, ol, z_arr)
-    # plot_parallel(z_arr, dist_para, ok)
+    plot_parallel(z_arr, dist_para, ok)
     plot_perp_thet(zs, theta_arr, dist_thet, ok)
     plot_perp_phi(zs, phi_arr, dist_phi, ok)
