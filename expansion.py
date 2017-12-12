@@ -34,15 +34,17 @@ def parallel(matter_dp, lambda_dp, zs_array):
     return dist
 
 
-def numerical_check(matter_dp, lambda_dp, zs_array):
+def numerical_check(matter_dp, lambda_dp, zs_array, q0):
     H0 = 70000
     c = 2.998e5
     test_dist = parallel(matter_dp, lambda_dp, zs_array)
     analytical_dist = -c / H0 * 2 * (1 / np.sqrt(zs_array + 1) - 1)  # om = 1, ol = 0
+    # Liske_dist = -c / H0 / q0**2 / (1+zs_array) * (q0 * z + (q0 - 1) * (np.sqrt(1 + 2 * q0 * zs_array) - 1))
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(zs_array, test_dist, label="Numerical")
     ax.plot(zs_array, analytical_dist, label="Analytical")
+    ax.plot(zs_array, Liske_dist, label="Liske")
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (Gpc)", fontsize=16)
@@ -123,6 +125,20 @@ def plot_perp_phi(z_contours, phis_array, dists, curvature):
     # fig.savefig("phi.pdf", bbox_inches="tight")
 
 
+def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array):
+    theta1 = np.pi/6
+    theta2 = np.pi/4
+    dist2 = perp_thet(matter_dp, lambda_dp, zs_array, z_contour, theta1)
+    dist1 = perp_thet(matter_dp, lambda_dp, zs_array, z_contour, theta2)
+    theta_dist = dist2 - dist1
+    phi_dist = perp_phi(matter_dp, lambda_dp, zs_array, z_contour, theta2, phis_array)
+    dist_perp = np.sqrt(theta_dist**2 + phi_dist**2)
+    parallel_dists = parallel(matter_dp, lambda_dp, zs_array)
+    radius = parallel_dists[np.argmin(np.abs(zs_array - z_contour))]
+    theory = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2))
+    return dist_perp, theory
+
+
 if __name__ == "__main__":
     vecGet_h_inv = np.vectorize(get_h_inv, excluded=['om', 'ol'])
 
@@ -151,7 +167,18 @@ if __name__ == "__main__":
         for j, z in enumerate(zs, start=0):
             dist_phi[i][j] = perp_phi(om, ol, z_arr, z, angle, phi_arr)
 
-    numerical_check(om, ol, z_arr)
-    plot_parallel(z_arr, dist_para, ok)
-    plot_perp_thet(zs, theta_arr, dist_thet, ok)
-    plot_perp_phi(zs, phi_arr, dist_phi, ok)
+    x, y = total_perp(om, ol, z_arr, 10, phi_arr)
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(z_arr, x, label="Approximation")
+    ax.plot(z_arr, y, label="Analytical")
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
+    ax.set_xlabel("$\phi$", fontsize=16)
+    ax.set_ylabel("$D_\perp$ (Gpc)", fontsize=16)
+    ax.set_title("Total Parallel Distance", fontsize=20)
+    plt.show()
+
+    # numerical_check(om, ol, z_arr, 0.5)
+    # plot_parallel(z_arr, dist_para, ok)
+    # plot_perp_thet(zs, theta_arr, dist_thet, ok)
+    # plot_perp_phi(zs, phi_arr, dist_phi, ok)
