@@ -133,8 +133,11 @@ def get_line_integrand(lambda_val, theta1, theta2, phi1, phi2):
      theta1, theta1 -- initial and final theta co-ordinates
      phi1, phi2 -- initial and final phi co-ordinates
     """
-    integrand = np.sqrt((theta2 - theta1) ** 2 + np.sin(theta1 + lambda_val * (theta2 - theta1))**2
-                        * (phi2 - phi1)**2)  # from angular part of FRW metric, or metric of a sphere, parametrised.
+    theta = theta2 - theta1
+    phi = phi2 - phi1
+    theta_l = theta1 + lambda_val * theta
+    integrand = np.sqrt(theta**2 + np.sin(theta_l)**2 * phi**2)  # from angular part of FRW metric,
+    # or metric of a sphere, parametrised.
     return integrand
 
 
@@ -147,13 +150,13 @@ def calculate_line_integral(phi_val, radius, theta1, theta2, phi1):
      theta1, theta2, phi1 -- initial and final co-ordinates of theta and phi
     """
     lambdas = np.linspace(0, 1, 101)
-    integrands = vecGet_line_integrand(lambdas, theta1, theta2, phi1, phi_val)  # not sure what this part does.
-    integral = radius * sp.cumtrapz(integrands, x=lambdas, initial=0)  # integral should start at r*(theta1-theta2),
+    integrands = get_line_integrand(lambdas, theta1, theta2, phi1, phi_val)
+    integral = radius * sp.cumtrapz(integrands, x=lambdas, initial=0)
     # but doesn't
-    return integral
+    return integral[-1]
 
 
-def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array):
+def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, theta2, phi1):
     """Calculates the total perpendicular distance in three ways.
     The ways are: approximation from pythagorean approximation using separate distance, analytical solution to arc
     length of great circle connecting the points (only used a check for the actual integration method), and the method
@@ -165,10 +168,6 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array):
      z_contour -- the redshift giving the radius of the sphere
      phis_array -- array of phi values to find distances as a function of phi
     """
-    # Select example points on the sphere for now
-    theta1 = np.pi/6
-    theta2 = np.pi/4
-    phi1 = 0  # phi2 goes from 0 to 2pi
 
     # Find approximate distance
     dist2 = perp_thet(matter_dp, lambda_dp, zs_array, z_contour, theta1)  # distance along theta to 1st pt.
@@ -178,23 +177,23 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array):
     # D_perp is a function of phi
     dist_perp = np.sqrt(theta_dist**2 + phi_dist**2)
 
-    # Find analytical value
+    # # Find analytical value
     parallel_dists = parallel(matter_dp, lambda_dp, zs_array)  # parallel distances to z_max
     radius = parallel_dists[np.argmin(np.abs(zs_array - z_contour))]   # select only the distance corresponding to the
-    # radius of the sphere
-    analytical = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1)
-                                    * np.cos(theta2))
+    # # radius of the sphere
+    # analytical = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1)
+    #                                 * np.cos(theta2))
 
     # Find numerical line integral distance
-    numerical = calculate_line_integral(phis_array, radius, theta1, theta2, phi1)  # calculates the line integral for
-    # every phi value
-    return dist_perp, analytical, numerical
+    numerical = vecCalculate_line_integral(phis_array, radius, theta1, theta2, phi1)
+
+    difference = numerical - dist_perp
+    return dist_perp, numerical, difference
 
 
 if __name__ == "__main__":
-    # Again, not too sure of the vectorisation stuff, or if I've done it right
     vecGet_h_inv = np.vectorize(get_h_inv, excluded=['om', 'ol'])
-    vecGet_line_integrand = np.vectorize(get_line_integrand, excluded=['theta1', 'theta2', 'phi1', 'phi2'])
+    vecCalculate_line_integral = np.vectorize(calculate_line_integral, excluded=['radius', 'theta1', 'theta2', 'phi1'])
 
     z_lo = 0.0
     z_hi = 15.0
@@ -226,16 +225,22 @@ if __name__ == "__main__":
 
     # Temporary terrible code to get everything working
     # Calculate the three total perpendicular distances
-    x, y, w = total_perp(om, ol, z_arr, 10, phi_arr)
+    x, w, diff = total_perp(om, ol, z_arr, 10, phi_arr, np.pi/6, np.pi/5, 0)
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    ax = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
     ax.plot(phi_arr[:51], x[:51], label="Approximation")  # only makes sense to plot 0 to pi
-    ax.plot(phi_arr[:51], y[:51], label="Analytical")
     ax.plot(phi_arr[:51], w[:51], label="Numerical")
-    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
-    ax.set_xlabel("$\phi$", fontsize=16)
-    ax.set_ylabel("$D_\perp$ (Gpc)", fontsize=16)
     ax.set_title("Total Parallel Distance", fontsize=20)
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.1, 0.8))
+    ax.set_ylabel("$D_\perp$ (Gpc)", fontsize=16)
+    ax.tick_params(labelbottom=False)
+
+    ax2 = plt.subplot2grid((4, 1), (3, 0))
+    ax2.plot(phi_arr[:51], diff[:51], label="Difference", color="r")
+    ax2.plot(phi_arr[:51], np.linspace(0, 0, 51), linestyle="--", color="k")
+    ax2.set_xlabel("$\phi$", fontsize=16)
+    ax2.set_ylabel("Diff. (Gpc)")
+    # fig.savefig("total_perp.pdf", bbox_inches="tight")
     plt.show()
 
     # No need for these right now
