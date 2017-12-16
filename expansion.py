@@ -45,13 +45,13 @@ def numerical_check(matter_dp, lambda_dp, zs_array, q0):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(zs_array, test_dist, label="Numerical")
-    ax.plot(zs_array, analytical_dist, label="Analytical")
+    ax.plot(zs_array, analytical_dist, label="Analytical", linestyle="--")
     # ax.plot(zs_array, Liske_dist, label="Liske")  # Liske distance doesn't match
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
-    ax.set_title("Parallel Check", fontsize=20)
-    fig.savefig("analytical check.pdf", bbox_inches="tight")
+    ax.set_title("Numerical Versus Analytical Solution", fontsize=20)
+    fig.savefig("analytical_check.pdf", bbox_inches="tight")
     plt.show()
 
 
@@ -92,7 +92,7 @@ def plot_perp_thet(z_contours, thetas_array, dist, curvature):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\theta$", fontsize=16)
-    ax.set_ylabel("$R\chi$ (h$^{-1}$Gpc)", fontsize=16)
+    ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
         ax.plot(thetas_array, dist[num], label=f"$z={contour}$", color=colours[num])
     ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
@@ -111,7 +111,7 @@ def plot_perp_phi(z_contours, phis_array, dists, curvature):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\phi$", fontsize=16)
-    ax.set_ylabel("$R\chi\sin\\theta$ (h$^{-1}$Gpc)", fontsize=16)
+    ax.set_ylabel("$R_0\chi\sin\\theta$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
         ax.plot(phis_array, dists[0][num], label=f"$z={contour}$", color=colours[num])
     ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     z_arr = np.linspace(z_lo, z_hi, z_nstep)
 
     om = 0.3
-    ol = 1.0
+    ol = 0.7
     ok = 1.0 - om - ol
 
     phi_arr = np.linspace(0, 2 * np.pi, 101)
@@ -267,5 +267,5 @@ if __name__ == "__main__":
     # No need for these right now
     # numerical_check(om, ol, z_arr, 0.5)
     # plot_parallel(z_arr, dist_para, ok)
-    # plot_perp_thet(zs, theta_arr, dist_thet, ok)
-    # plot_perp_phi(zs, phi_arr, dist_phi, ok)
+    plot_perp_thet(zs, theta_arr, dist_thet, ok)
+    plot_perp_phi(zs, phi_arr, dist_phi, ok)
