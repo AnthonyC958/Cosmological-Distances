@@ -190,7 +190,8 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
     numerical = vecCalculate_line_integral(phis_array, radius, theta1, theta2, phi1)
 
     difference = numerical - dist_perp
-    return dist_perp, numerical, difference
+    norm_diff = difference/numerical
+    return dist_perp, numerical, difference, norm_diff
 
 
 if __name__ == "__main__":
@@ -203,7 +204,7 @@ if __name__ == "__main__":
     z_arr = np.linspace(z_lo, z_hi, z_nstep)
 
     om = 0.3
-    ol = 0.7
+    ol = 1.0
     ok = 1.0 - om - ol
 
     phi_arr = np.linspace(0, 2 * np.pi, 101)
@@ -243,28 +244,28 @@ if __name__ == "__main__":
     ax.set_title("Total Parallel Distance", fontsize=20)
     ax2 = plt.subplot2grid((4, 1), (3, 0))
     ax2.set_xlabel("$\phi$", fontsize=16)
-    ax2.set_ylabel("Diff. (h$^{-1}$Gpc)")
+    ax2.set_ylabel("Norm. Diff. (h$^{-1}$Gpc)")
     ax.tick_params(labelbottom=False)
     ax2.plot(phi_arr[:51], np.linspace(0, 0, 51), linestyle="--", color="k")
     colours = matplotlib.cm.rainbow(np.linspace(0, 1, theta_ends.size))
     for l, end in enumerate(theta_ends, start=0):
-        dist_perps[l], theory_perps[l], dist_diffs[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
-                                                                   theta_starts[l], theta_ends[l])
+        dist_perps[l], theory_perps[l], _, dist_diffs[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
+                                                                      theta_starts[l], theta_ends[l])
         ax.plot(phi_arr[:51], dist_perps[l][:51], label=f"$\Delta\\theta$ = {int(np.ceil(theta_starts[l]/deg))}$^\circ$"
                                                         + f" - {int(theta_ends[l]/deg)}$^\circ$", color=colours[l])
         ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.05, 0.9))
     for l, end in enumerate(theta_ends, start=0):
-        dist_perps[l], theory_perps[l], dist_diffs[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
-                                                                   theta_starts[l], theta_ends[l])
+        dist_perps[l], theory_perps[l], _, dist_diffs[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
+                                                                      theta_starts[l], theta_ends[l])
         ax.plot(phi_arr[:51], theory_perps[l][:51], label="Numerical", linestyle="--", color=colours[l])
 
         ax2.plot(phi_arr[:51], dist_diffs[l][:51], label="Difference", color=colours[l])
 
     plt.show()
-    fig.savefig("total_perp.pdf", bbox_inches="tight")
+    # fig.savefig("total_perp.pdf", bbox_inches="tight")
 
     # No need for these right now
     # numerical_check(om, ol, z_arr, 0.5)
-    plot_parallel(z_arr, dist_para, ok)
-    plot_perp_thet(zs, theta_arr, dist_thet, ok)
-    plot_perp_phi(zs, phi_arr, dist_phi, ok)
+    # plot_parallel(z_arr, dist_para, ok)
+    # plot_perp_thet(zs, theta_arr, dist_thet, ok)
+    # plot_perp_phi(zs, phi_arr, dist_phi, ok)
