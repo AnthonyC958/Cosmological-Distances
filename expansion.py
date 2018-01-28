@@ -51,7 +51,7 @@ def numerical_check(matter_dp, lambda_dp, zs_array, q0):
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
     ax.set_title("Numerical Versus Analytical Solution", fontsize=20)
-    fig.savefig("analytical_check.pdf", bbox_inches="tight")
+    # fig.savefig("analytical_check.pdf", bbox_inches="tight")
     plt.show()
 
 
@@ -83,7 +83,7 @@ def plot_parallel(zs_array, dist, curvature):
         ax.set_title("Parallel Distance (Negative Curved Space)", fontsize=20)
     else:
         ax.set_title("Parallel Distance (Positive Curved Space)", fontsize=20)
-    fig.savefig("parallel.pdf", bbox_inches="tight")
+    # fig.savefig("parallel.pdf", bbox_inches="tight")
     plt.show()
 
 
@@ -103,7 +103,7 @@ def plot_perp_thet(z_contours, thetas_array, dist, curvature):
     else:
         ax.set_title("$\\theta$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
     plt.show()
-    fig.savefig("theta.pdf", bbox_inches="tight")
+    # fig.savefig("theta.pdf", bbox_inches="tight")
 
 
 def plot_perp_phi(z_contours, phis_array, dists, curvature):
@@ -124,7 +124,7 @@ def plot_perp_phi(z_contours, phis_array, dists, curvature):
     else:
         ax.set_title("$\\phi$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
     plt.show()
-    fig.savefig("phi.pdf", bbox_inches="tight")
+    # fig.savefig("phi.pdf", bbox_inches="tight")
 
 
 def get_line_integrand(lambda_val, theta1, theta2, phi1, phi2):
@@ -182,15 +182,15 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
     parallel_dists = parallel(matter_dp, lambda_dp, zs_array)  # parallel distances to z_max
     radius = parallel_dists[np.argmin(np.abs(zs_array - z_contour))]  # select only the distance corresponding to the
     # # radius of the sphere
-    # analytical = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1)
-    #                                 * np.cos(theta2))
+    analytical = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1)
+                                    * np.cos(theta2))
 
     # Find numerical line integral distance
     numerical = vecCalculate_line_integral(phis_array, radius, theta1, theta2, phi1)
 
     difference = numerical - dist_perp
     norm_diff = difference/numerical
-    return dist_perp, numerical, difference, norm_diff
+    return dist_perp, numerical, difference, norm_diff, analytical
 
 
 def get_line_integrand_total(lambda_val, r1, r2, theta1, theta2, phi1, phi2):
@@ -254,10 +254,46 @@ def plot_total_perp(dists, numerical, diffs):
     # fig.savefig("total_perp.pdf", bbox_inches="tight")
 
 
+def circle_integrand(theta_val, k):
+    theta_0 = 0
+    return k / np.cos(theta_val - theta_0) / np.cos(theta_val - theta_0)
+
+
+def circle(r):
+    """Finds the chord, arc and geodesic distance of a circle."""
+    theta = np.linspace(0, 2 * np.pi, 151)
+
+    # Chord length
+    chord = 2 * r * np.sin(theta / 2)
+
+    # Arc length
+    arc = r * theta
+
+    # Geodesic distance
+    integrands = vecCircle_integrands(theta, r)
+    geo = sp.cumtrapz(integrands, x=theta, initial=0)
+    # geo = r*np.tan(theta)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(theta, chord, label="Chord length")
+    ax.plot(theta, arc, label="Arc length")
+    ax.plot(theta, geo, label="Geodesic distance")
+
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
+    ax.set_xlabel("$\\theta$", fontsize=16)
+    ax.set_ylabel("Length", fontsize=16)
+    ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
+    # fig.savefig("parallel.pdf", bbox_inches="tight")
+    plt.show()
+
+
 if __name__ == "__main__":
     vecGet_h_inv = np.vectorize(get_h_inv, excluded=['om', 'ol'])
     vecCalculate_line_integral = np.vectorize(calculate_line_integral, excluded=['radius', 'theta1', 'theta2', 'phi1'])
-    vecCalculate_line_integral_total = np.vectorize(calculate_line_integral_total, excluded=['theta1', 'theta2', 'phi1', 'phi2', 'r1'])
+    vecCalculate_line_integral_total = np.vectorize(calculate_line_integral_total, excluded=['theta1', 'theta2', 'phi1',
+                                                                                             'phi2', 'r1'])
+    vecCircle_integrands = np.vectorize(circle_integrand, excluded=['k'])
 
     z_lo = 0.0
     z_hi = 15.0
@@ -292,19 +328,20 @@ if __name__ == "__main__":
     z_radius = 1
     theta_starts = np.array([0, 0, 15 * deg, 15 * deg, 30 * deg, 30 * deg])
     theta_ends = np.array([5 * deg, 10 * deg, 20 * deg, 25 * deg, 35 * deg, 40 * deg])
-    dist_perps = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
+    analyts = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
         theta_starts.size, phi_arr.size)
     theory_perps = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
         theta_starts.size, phi_arr.size)
     dist_diffs = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
         theta_starts.size, phi_arr.size)
     for l, end in enumerate(theta_ends, start=0):
-        dist_perps[l], theory_perps[l], _, dist_diffs[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
+        _, theory_perps[l], _, dist_diffs[l], analyts[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
                                                                       theta_starts[l], theta_ends[l])
 
     # No need for these right now
-    # numerical_check(om, ol, z_arr, 0.5)
-    # plot_parallel(z_arr, dist_para, ok)
-    # plot_perp_thet(zs, theta_arr, dist_thet, ok)
-    # plot_perp_phi(zs, phi_arr, dist_phi, ok)
-    plot_total_perp(dist_perps, theory_perps, dist_diffs)
+    numerical_check(om, ol, z_arr, 0.5)
+    plot_parallel(z_arr, dist_para, ok)
+    plot_perp_thet(zs, theta_arr, dist_thet, ok)
+    plot_perp_phi(zs, phi_arr, dist_phi, ok)
+    plot_total_perp(analyts, theory_perps, dist_diffs)
+    circle(1)
