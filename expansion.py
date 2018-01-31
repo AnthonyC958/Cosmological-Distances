@@ -257,7 +257,8 @@ def plot_total_perp(dists, numerical, diffs):
 
 
 def get_circle_integrand(theta_val, theta0, k):
-    return k / np.cos(theta_val - theta0)**2
+    int = np.longdouble(np.cos(theta_val - theta0)**2)
+    return np.longdouble(k / int)
 
 
 def calculate_circle_integral(theta2, r):
@@ -271,7 +272,7 @@ def calculate_circle_integral(theta2, r):
 
 def circle(r):
     """Finds the chord, arc and geodesic distance of a circle."""
-    theta_range = np.linspace(0, np.pi, 151)
+    theta_range = np.longdouble(np.linspace(np.longdouble(0), np.longdouble(np.pi), 151))
 
     # Chord length
     chord = 2 * r * np.sin(theta_range / 2)
@@ -280,7 +281,7 @@ def circle(r):
     arc = r * theta_range
 
     # Geodesic distance
-    geo = vecCalculate_circle_integral(theta_range, r)
+    geo = vecCalculate_circle_integral(np.longdouble(theta_range), np.longdouble(r))
     # geo = r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2) * 2
 
     fig = plt.figure()
@@ -295,6 +296,20 @@ def circle(r):
     ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
     # fig.savefig("parallel.pdf", bbox_inches="tight")
     plt.show()
+
+
+def geodesic_equations(s, r0, theta0):
+    k = r0 * np.cos(theta0)
+    k = r0
+    r = np.sqrt(s**2 + k**2)
+    theta = np.arctan(s/k) + theta0
+    return r, theta
+
+
+def rtheta(r0, theta, theta0):
+    k = r0 * np.cos(theta0)
+    k = r0
+    return k / np.cos(theta-theta0)
 
 
 if __name__ == "__main__":
@@ -349,10 +364,34 @@ if __name__ == "__main__":
         dists[l], theory_perps[l], _, dist_diffs[l], analyts[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
                                                                              theta_starts[l], theta_ends[l])
 
+    colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
+
+    larr = np.arange(101) / 25. - 1.0
+    theta0 = np.array([np.pi/4, np.pi/6, np.pi/8])  # theta2 = theta0/2
+    divs = [4, 6, 8]
+    th_arr = np.arange(101) / 100.
+
+    for k in [1, 2, 3]:
+        r, theta1 = geodesic_equations(larr, k, theta0[k-1])
+        x = r * np.cos(theta1)
+        y = r * np.sin(theta1)
+        plt.plot(x, y, color=colours[k-1], label=f"k = {k}, $\\theta_0$ = $\pi$/{divs[k-1]}")
+    plt.ylabel("y")
+    plt.xlabel("x")
+    plt.axis('equal')
+    plt.legend(loc="lower left", frameon=False, bbox_to_anchor=(0, 0))
+    plt.show()
+
+    for k in [1, 2, 3]:
+        r_theta = rtheta(k, th_arr*theta0[k-1]*2, theta0[k-1])
+        plt.plot(th_arr*theta0[k-1]*2, r_theta, color=colours[k - 1], label=f"k = {k}, $\\theta_0$ = $\pi$/{divs[k-1]}")
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(1, 1))
+    plt.show()
+
     # No need for these right now
     # numerical_check(om, ol, z_arr, 0.5)
     # plot_parallel(z_arr, dist_para, ok)
     # plot_perp_thet(zs, theta_arr, dist_thet, ok)
     # plot_perp_phi(zs, phi_arr, dist_phi, ok)
-    plot_total_perp(dists, theory_perps, dist_diffs)
+    # plot_total_perp(dists, theory_perps, dist_diffs)
     circle(1)
