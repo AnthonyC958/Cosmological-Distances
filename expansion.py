@@ -257,14 +257,14 @@ def plot_total_perp(dists, numerical, diffs):
 
 
 def get_circle_integrand(theta_val, theta0, k):
-    int = np.longdouble(np.cos(theta_val - theta0)**2)
+    int = np.longdouble(np.cos(theta_val-theta0)**2)
     return np.longdouble(k / int)
 
 
 def calculate_circle_integral(theta2, r):
     theta0 = theta2 / 2
     k = r * np.cos(theta0)
-    theta_array = np.linspace(0, theta2, 101)
+    theta_array = np.linspace(0, theta2, 1001)
     integrands = get_circle_integrand(theta_array, theta0, k)
     integral = sp.cumtrapz(integrands, x=theta_array, initial=0)
     return integral[-1]
@@ -272,7 +272,7 @@ def calculate_circle_integral(theta2, r):
 
 def circle(r):
     """Finds the chord, arc and geodesic distance of a circle."""
-    theta_range = np.longdouble(np.linspace(np.longdouble(0), np.longdouble(np.pi), 151))
+    theta_range = np.longdouble(np.linspace(np.longdouble(0), np.longdouble(np.pi), 1001))
 
     # Chord length
     chord = 2 * r * np.sin(theta_range / 2)
@@ -282,18 +282,18 @@ def circle(r):
 
     # Geodesic distance
     geo = vecCalculate_circle_integral(np.longdouble(theta_range), np.longdouble(r))
-    # geo = r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2) * 2
+    # geo = r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2)
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(theta_range, chord, label="Chord length")
     ax.plot(theta_range, arc, label="Arc length")
-    ax.plot(theta_range[:-2], geo[:-2], label="Geodesic distance")
+    ax.plot(theta_range[:-5], geo[:-5], label="Geodesic distance")
 
     ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("Length", fontsize=16)
-    ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
+    # ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
     # fig.savefig("parallel.pdf", bbox_inches="tight")
     plt.show()
 
@@ -366,7 +366,7 @@ if __name__ == "__main__":
 
     colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
 
-    larr = np.arange(101) / 25. - 1.0
+    larr = np.arange(101) / 50. - 1.0
     theta0 = np.array([np.pi/4, np.pi/6, np.pi/8])  # theta2 = theta0/2
     divs = [4, 6, 8]
     th_arr = np.arange(101) / 100.
@@ -376,16 +376,24 @@ if __name__ == "__main__":
         x = r * np.cos(theta1)
         y = r * np.sin(theta1)
         plt.plot(x, y, color=colours[k-1], label=f"k = {k}, $\\theta_0$ = $\pi$/{divs[k-1]}")
-    plt.ylabel("y")
-    plt.xlabel("x")
+        plt.plot([0, k*np.cos(theta0[k-1])], [0, k*np.sin(theta0[k-1])], color=colours[k-1], linestyle=':')
+        plt.plot(x[25:51], np.sqrt(k ** 2 - x[25:51] ** 2), color=colours[k - 1],
+                 linestyle=':')
+        plt.plot(x[51:-5], np.sqrt(k ** 2 - x[51:-5] ** 2), color=colours[k - 1],
+                 linestyle=':')
+    plt.ylabel("y", fontsize=16)
+    plt.xlabel("x", fontsize=16)
     plt.axis('equal')
-    plt.legend(loc="lower left", frameon=False, bbox_to_anchor=(0, 0))
+    plt.legend(loc="upper left", frameon=False, bbox_to_anchor=(0, 1))
     plt.show()
 
-    for k in [1, 2, 3]:
-        r_theta = rtheta(k, th_arr*theta0[k-1]*2, theta0[k-1])
-        plt.plot(th_arr*theta0[k-1]*2, r_theta, color=colours[k - 1], label=f"k = {k}, $\\theta_0$ = $\pi$/{divs[k-1]}")
-    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(1, 1))
+    for c, k in enumerate([1, 1, 1]):
+        r_theta = rtheta(k, th_arr*theta0[c]*2, theta0[c])
+        plt.plot(th_arr*theta0[c]*2, r_theta, color=colours[c], label=f"$\\theta_0$ = $\pi$/{divs[c]}")
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1))
+    plt.xlabel("$\\theta$", fontsize=16)
+    plt.ylabel("$r(\\theta)$", fontsize=16)
+    plt.figtext(0.47, 0.67, f"k = {k}", ha='right', va='bottom', weight='roman')
     plt.show()
 
     # No need for these right now
