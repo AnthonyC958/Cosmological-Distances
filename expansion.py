@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib, matplotlib.pyplot as plt
 import scipy.integrate as sp
 
+colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
+
 
 def get_h_inv(z_val, matter_dp, lambda_dp):
     """Integrand for calculating comoving distance.
@@ -50,7 +52,7 @@ def numerical_check(matter_dp, lambda_dp, zs_array, q0):
     ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
-    ax.set_title("Numerical Versus Analytical Solution", fontsize=20)
+    # ax.set_title("Numerical Versus Analytical Solution", fontsize=20)
     # fig.savefig("analytical_check.pdf", bbox_inches="tight")
     plt.show()
 
@@ -73,56 +75,54 @@ def plot_parallel(zs_array, dist, curvature):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(zs_array, dist, label=r"$\Omega_m=%0.2f$" % om)
-    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
-    plt.figtext(0.85, 0.6, "$\Omega_\Lambda=%0.2f$" % ol, ha='right', va='bottom', weight='roman', size='large')
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.645, 0.8), fontsize=12)
+    plt.figtext(0.85, 0.6, "$\Omega_\Lambda=%0.2f$" % ol, ha='right', va='bottom', weight='roman', fontsize=12)
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
-    if curvature == 0:
-        ax.set_title("Parallel Distance (Flat Space)", fontsize=20)
-    elif curvature < 0:
-        ax.set_title("Parallel Distance (Negative Curved Space)", fontsize=20)
-    else:
-        ax.set_title("Parallel Distance (Positive Curved Space)", fontsize=20)
+    # if curvature == 0:
+        # ax.set_title("Parallel Distance (Flat Space)", fontsize=20)
+    # elif curvature < 0:
+        # ax.set_title("Parallel Distance (Negative Curved Space)", fontsize=20)
+    # else:
+        # ax.set_title("Parallel Distance (Positive Curved Space)", fontsize=20)
     # fig.savefig("parallel.pdf", bbox_inches="tight")
     plt.show()
 
 
 def plot_perp_thet(z_contours, thetas_array, dist, curvature):
-    colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
         ax.plot(thetas_array, dist[num], label=f"$z={contour}$", color=colours[num])
-    ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
-    if curvature == 0:
-        ax.set_title("$\\theta$ Perpendicular Distance (Flat Space)", fontsize=20)
-    elif curvature < 0:
-        ax.set_title("$\\theta$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
-    else:
-        ax.set_title("$\\theta$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
+    ax.legend(loc="upper left", frameon=False, fontsize=12)  # ,bbox_to_anchor=(0, 0.5))
+    # if curvature == 0:
+    #     ax.set_title("$\\theta$ Perpendicular Distance (Flat Space)", fontsize=20)
+    # elif curvature < 0:
+    #     ax.set_title("$\\theta$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
+    # else:
+    #     ax.set_title("$\\theta$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
     plt.show()
     # fig.savefig("theta.pdf", bbox_inches="tight")
 
 
 def plot_perp_phi(z_contours, phis_array, dists, curvature):
-    colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlabel("$\\phi$", fontsize=16)
     ax.set_ylabel("$R_0\chi\sin\\theta$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
         ax.plot(phis_array, dists[0][num], label=f"$z={contour}$", color=colours[num])
-    ax.legend(loc="upper left", frameon=False)  # ,bbox_to_anchor=(0, 0.5))
+    ax.legend(loc="upper left", frameon=False, fontsize=12)  # ,bbox_to_anchor=(0, 0.5))
     for num, contour in enumerate(z_contours, start=0):
         ax.plot(phis_array, dists[1][num], label=f"$z={contour}$", color=colours[num], linestyle="--")
-    if curvature == 0:
-        ax.set_title("$\\phi$ Perpendicular Distance (Flat Space)", fontsize=20)
-    elif curvature < 0:
-        ax.set_title("$\\phi$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
-    else:
-        ax.set_title("$\\phi$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
+    # if curvature == 0:
+    #     ax.set_title("$\\phi$ Perpendicular Distance (Flat Space)", fontsize=20)
+    # elif curvature < 0:
+    #     ax.set_title("$\\phi$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
+    # else:
+    #     ax.set_title("$\\phi$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
     plt.show()
     # fig.savefig("phi.pdf", bbox_inches="tight")
 
@@ -169,15 +169,15 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
      z_contour -- the redshift giving the radius of the sphere
      phis_array -- array of phi values to find distances as a function of phi
     """
-    phi1 = 0
+    phi1 = 0.0
     # Find approximate distance
     dist1 = perp_thet(matter_dp, lambda_dp, zs_array, z_contour, theta1)  # distance along theta to 1st pt.
     dist2 = perp_thet(matter_dp, lambda_dp, zs_array, z_contour, theta2)  # distance to theta co-ordinate of 2nd pt.
     theta_dist = dist2 - dist1
     phi_dist = perp_phi(matter_dp, lambda_dp, zs_array, z_contour, theta2, phis_array)  # array of phi distances, so
     # D_perp is a function of phi
-    dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2 - theta_dist * phi_dist * np.cos(np.sin(theta1) * np.sin(theta2)
-                        * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2)))
+    dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2 - 2 * theta_dist * phi_dist * np.cos(np.arccos(np.sin(theta1) *
+                        np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2))))
     # dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2)
 
     # # Find analytical value
@@ -188,11 +188,19 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
                                     * np.cos(theta2))
 
     # Find numerical line integral distance
-    numerical = vecCalculate_line_integral(phis_array, radius, theta1, theta2, phi1)
+    pt1 = np.array([radius * np.sin(theta1), 0.0, radius * np.cos(theta1)])
+    pt3 = np.array([radius * np.sin(theta2), 0.0, radius * np.cos(theta2)])
+    td = np.linalg.norm(pt3-pt1)
+    pt2 = [radius * np.sin(theta2)*np.cos(phis_array), radius * np.sin(theta2)*np.sin(phis_array),
+           radius * np.cos(theta2)]
+    pd = np.linalg.norm(pt2-pt3)
+    pdist = np.sqrt((pt1[0] - pt2[0])**2 + pt2[1]**2 + (pt1[2] - pt2[2])**2)
+    proper = np.sqrt(td**2 + pd**2 - 2 * td * pd * np.cos(np.sin(theta1) *
+                        np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2)))
 
-    difference = numerical - dist_perp
-    norm_diff = difference/numerical
-    return dist_perp, numerical, difference, norm_diff, analytical
+    difference = analytical - dist_perp
+    norm_diff = difference/analytical
+    return dist_perp, proper, difference, norm_diff, analytical
 
 
 def get_line_integrand_total(lambda_val, r1, r2, theta1, theta2, phi1, phi2):
@@ -236,21 +244,20 @@ def plot_total_perp(dists, numerical, diffs):
     fig = plt.figure()
     ax = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
     ax.set_ylabel("$D_\perp$ (h$^{-1}$Gpc)", fontsize=16)
-    ax.set_title("Total Perpendicular Distance", fontsize=20)
+    # ax.set_title("Total Perpendicular Distance", fontsize=20)
     ax2 = plt.subplot2grid((4, 1), (3, 0))
     ax2.set_xlabel("$\phi$", fontsize=16)
     ax2.set_ylabel("Norm. Diff. (h$^{-1}$Gpc)")
     ax.tick_params(labelbottom=False)
-    ax2.plot(phi_arr[:51], np.linspace(0, 0, 51), linestyle=":", color="k")
-    colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
+    ax2.plot(phi_arr[:501], np.linspace(0, 0, 501), linestyle=":", color="k")
     for l, end in enumerate(theta_ends, start=0):
-        ax.plot(phi_arr[:51], dists[l][:51], label=f"$\Delta\\theta$ = {int(np.ceil(theta_starts[l]/deg))}$^\circ$"
+        ax.plot(phi_arr[:501], dists[l][:501], label=f"$\Delta\\theta$ = {int(np.ceil(theta_starts[l]/deg))}$^\circ$"
                                                    + f" - {int(theta_ends[l]/deg)}$^\circ$", color=colours[l])
         ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.05, 0.9))
     for l, end in enumerate(theta_ends, start=0):
-        ax.plot(phi_arr[:51], numerical[l][:51], label="Numerical", linestyle="--", color=colours[l])
+        ax.plot(phi_arr[:501], numerical[l][:501], label="Numerical", linestyle="--", color=colours[l])
 
-        ax2.plot(phi_arr[:51], diffs[l][:51], label="Difference", color=colours[l])
+        ax2.plot(phi_arr[:501], diffs[l][:501], label="Difference", color=colours[l])
 
     plt.show()
     # fig.savefig("total_perp.pdf", bbox_inches="tight")
@@ -270,10 +277,16 @@ def calculate_circle_integral(theta2, r):
     return integral[-1]
 
 
-def circle(r):
-    """Finds the chord, arc and geodesic distance of a circle."""
-    theta_range = np.longdouble(np.linspace(np.longdouble(0), np.longdouble(np.pi), 1001))
+def calculate_polar_integral(theta0, theta2, r):
+    k = r * np.cos(theta0)
+    theta_array = np.linspace(0, theta2, 1001)
+    integrands = get_circle_integrand(theta_array, theta0, k)
+    integral = sp.cumtrapz(integrands, x=theta_array, initial=0)
+    return integral
 
+
+def polar(r, theta_range):
+    """Finds the chord, arc and geodesic distance of a circle."""
     # Chord length
     chord = 2 * r * np.sin(theta_range / 2)
 
@@ -281,16 +294,22 @@ def circle(r):
     arc = r * theta_range
 
     # Geodesic distance
-    geo = vecCalculate_circle_integral(np.longdouble(theta_range), np.longdouble(r))
-    # geo = r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2)
+    geo = vecCalculate_circle_integral(theta_range, r)
+    # geo = 2 * r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2)
 
+    return chord, arc, geo
+
+
+def plot_polar(r):
+    theta_range = np.linspace(np.longdouble(0), np.longdouble(np.pi), 1001)
+    chord, arc, geo = polar(r, theta_range)
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(theta_range, chord, label="Chord length")
-    ax.plot(theta_range, arc, label="Arc length")
     ax.plot(theta_range[:-5], geo[:-5], label="Geodesic distance")
+    ax.plot(theta_range, chord, label="Chord length", linestyle='--')
+    ax.plot(theta_range, arc, label="Arc length")
 
-    ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.7, 0.8))
+    ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.6, 0.7), fontsize=12)
     ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("Length", fontsize=16)
     # ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
@@ -312,24 +331,148 @@ def rtheta(r0, theta, theta0):
     return k / np.cos(theta-theta0)
 
 
+def liske(x1, x2, alpha):
+    return np.sqrt(x1**2 + x2**2 - 2*x1*x2*np.cos(alpha))
+
+
+def roukema(chi1, chi2, alpha):
+    # Convert to equatorial co-ordinates
+    d1 = 0
+    a1 = 0
+    a2 = alpha
+    d2 = 0
+
+    x1 = chi1 * np.cos(d1) * np.cos(a1)
+    x2 = chi2 * np.cos(d2) * np.cos(a2)
+    y1 = chi1 * np.cos(d1) * np.sin(a1)
+    y2 = chi2 * np.cos(d2) * np.sin(a2)
+    z1 = chi1 * np.sin(d1)
+    z2 = chi2 * np.sin(d2)
+
+    inner_prod = (x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2
+    return np.sqrt(inner_prod)
+
+
+def liske_distances():
+    chi1 = [2, 8]
+    chi2 = [1, 2, 4, 2, 8, 10]
+    alpha = np.linspace(0, np.pi/2, 501)
+
+    # First comoving distance
+    L11 = liske(chi1[0], chi2[0], alpha)
+    L12 = liske(chi1[0], chi2[1], alpha)
+    L13 = liske(chi1[0], chi2[2], alpha)
+
+    # Second
+    L21 = liske(chi1[1], chi2[3], alpha)
+    L22 = liske(chi1[1], chi2[4], alpha)
+    L23 = liske(chi1[1], chi2[5], alpha)
+
+    plt.plot(alpha, L11, color=colours[0], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[0]}")
+    plt.plot(alpha, L12, color=colours[1], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[1]}")
+    plt.plot(alpha, L13, color=colours[2], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[2]}")
+
+    plt.plot(alpha, L21, color=colours[3], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[3]}")
+    plt.plot(alpha, L22, color=colours[4], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[4]}")
+    plt.plot(alpha, L23, color=colours[5], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[5]}")
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1))
+    plt.xlabel("$\\alpha$", fontsize=16)
+    plt.ylabel("$R_0\chi_{12}$ (h$^{-1}$Gpc)", fontsize=16)
+    plt.show()
+
+
+def dist_comp():
+    #  Values necessary for numerical integration #
+    R1 = 1
+    theta1 = 0
+
+    # theta0's to specify angle of line
+    theta0 = np.array([np.deg2rad(0), np.deg2rad(-85), np.deg2rad(45), np.deg2rad(-45)])
+    k = R1 * np.cos(theta0)
+
+    # Integral limits
+    theta2 = np.array([np.deg2rad(50), np.deg2rad(1), np.deg2rad(110), np.deg2rad(30)])
+
+    s = np.arange(1001*4, dtype=np.float64).reshape(4, 1001)
+    for m in [0, 1, 2, 3]:
+        s[m] = calculate_polar_integral(theta0[m], theta2[m], R1)
+        plt.plot(np.linspace(0, 1, 1001), s[m], label=f"$\\theta_0 = {int(np.rad2deg(theta0[m]))}^\circ$",
+                 linewidth=1.8)
+
+    # Values necessary for Liske's method
+    R2 = np.array([np.sqrt(R1**2 + s[0][-1]**2),
+                   np.sqrt(R1**2 + s[1][-1]**2 + 2*R1*s[1][-1]*np.cos(theta0[1]+np.pi/2)),
+                   np.sqrt(R1**2 + s[2][-1]**2 - 2*R1*s[2][-1]*np.cos(theta0[2])),
+                   np.sqrt(R1**2 + s[3][-1]**2 + 2*R1*s[3][-1]*np.cos(theta0[3]+np.pi/2))
+                   ])
+
+    theta = np.array([np.arccos(R1 / R2[0]),
+                     np.arccos((R1 + s[1][-1] * np.cos(theta0[1]+np.pi/2)) / R2[1]),
+                     np.arccos((R1 - s[2][-1] * np.cos(theta0[2])) / R2[2]),
+                     np.arccos((R1 + s[3][-1] * np.cos(theta0[3]+np.pi/2)) / R2[3])
+                      ])
+
+    L = np.arange(1001*4, dtype=np.float64).reshape(4, 1001)
+    R2 = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    alpha = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    col = [[0, 0.8, 1], [1, 0.85, 0], [0, 1, 0.1], [1, 0.6, 0.7]]
+    for m in[0, 1, 2, 3]:
+        alpha[m] = np.linspace(0, theta[m], 1001)
+        R2[m] = rtheta(k[m], alpha[m], theta0[m])
+        L[m] = liske(R1, R2[m], alpha[m])
+        plt.plot(np.linspace(0, 1, 1001), L[m], linestyle='--', color=col[m]) #, label=f"Liske $\\theta_0 = "
+                                                                                    # f"{int(np.rad2deg(theta0[m]))}"
+                                                                                    # f"^\circ$")
+    plt.xlabel("s", fontsize=16)
+    plt.ylabel("Distance", fontsize=16)
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=12)
+    plt.show()
+
+
+# Geodesics on the surface of a sphere #
+# def t_of_p(p, p0, A):
+#     return np.tan(1 / (A * np.cos(p - p0)))
+#
+#
+# def dtdp(p, p0, A):
+#     return A * np.sin(p - p0) * np.sin(t_of_p(p, p0, A))**2
+#
+#
+# def getint(pval, p0, A):
+#     return np.sqrt(dtdp(pval, p0, A)**2 + np.sin(t_of_p(pval, p0, A))**2)
+#
+#
+# def great_circle(t1, t2, p1, p2, R):
+#     a = R**2 * (np.cos(t2)*np.sin(p1)*np.sin(t1) - np.cos(t1)*np.sin(p2)*np.sin(t2))
+#     b = R**2 * (np.cos(t1)*np.cos(p2)*np.sin(t2) - np.cos(p1)*np.cos(t2)*np.sin(t1))
+#     c = R**2 * (np.cos(p1)*np.sin(t1)*np.sin(p2)*np.sin(t2) - np.cos(p2)*np.sin(p1)*np.sin(t1)*np.sin(t2))
+#     A = -np.sqrt(a**2 + b**2)/c
+#     p0 = np.arccos(a/np.sqrt(a**2 + b**2))
+#     p_arr = np.linspace(p1, p2, 151)
+#     dss = getint(p_arr, p0, A)
+#     s = sp.cumtrapz(dss, x=p_arr, initial=0)
+#     return s
+#
+
 if __name__ == "__main__":
     vecGet_h_inv = np.vectorize(get_h_inv, excluded=['om', 'ol'])
     vecCalculate_line_integral = np.vectorize(calculate_line_integral, excluded=['radius', 'theta1', 'theta2', 'phi1'])
     vecCalculate_line_integral_total = np.vectorize(calculate_line_integral_total, excluded=['theta1', 'theta2', 'phi1',
                                                                                              'phi2', 'r1'])
     vecCalculate_circle_integral = np.vectorize(calculate_circle_integral, excluded=[''])
+    # vecGetint = np.vectorize(getint, excluded=['p0', 'A'])
 
     z_lo = 0.0
     z_hi = 15.0
-    z_nstep = 101
+    z_nstep = 1001
     z_arr = np.linspace(z_lo, z_hi, z_nstep)
 
     om = 0.3
     ol = 0.7
     ok = 1.0 - om - ol
 
-    phi_arr = np.linspace(0, 2 * np.pi, 101)
-    theta_arr = np.linspace(0, 2 * np.pi, 101)
+    phi_arr = np.linspace(0, 2 * np.pi, 1001)
+    theta_arr = np.linspace(0, 2 * np.pi, 1001)
 
     # Calculate parallel distance for plotting
     dist_para = parallel(om, ol, z_arr)
@@ -364,8 +507,6 @@ if __name__ == "__main__":
         dists[l], theory_perps[l], _, dist_diffs[l], analyts[l] = total_perp(om, ol, z_arr, z_radius, phi_arr,
                                                                              theta_starts[l], theta_ends[l])
 
-    colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
-
     larr = np.arange(101) / 50. - 1.0
     theta0 = np.array([np.pi/4, np.pi/6, np.pi/8])  # theta2 = theta0/2
     divs = [4, 6, 8]
@@ -384,16 +525,18 @@ if __name__ == "__main__":
     plt.ylabel("y", fontsize=16)
     plt.xlabel("x", fontsize=16)
     plt.axis('equal')
-    plt.legend(loc="upper left", frameon=False, bbox_to_anchor=(0, 1))
-    plt.show()
+    plt.legend(loc="upper left", frameon=False, bbox_to_anchor=(0, 1), fontsize=12)
+    # plt.show()
 
+    # r_theta2 = rtheta(1, th_arr * theta0[0] * 2, theta0[2])
+    # plt.plot(th_arr * theta0[0] * 2, r_theta2, color=colours[3])
     for c, k in enumerate([1, 1, 1]):
         r_theta = rtheta(k, th_arr*theta0[c]*2, theta0[c])
         plt.plot(th_arr*theta0[c]*2, r_theta, color=colours[c], label=f"$\\theta_0$ = $\pi$/{divs[c]}")
-    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1))
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=12)
     plt.xlabel("$\\theta$", fontsize=16)
     plt.ylabel("$r(\\theta)$", fontsize=16)
-    plt.figtext(0.47, 0.67, f"k = {k}", ha='right', va='bottom', weight='roman')
+    plt.figtext(0.466, 0.648, f"k = {k}", ha='right', va='bottom', weight='roman', fontsize=12)
     plt.show()
 
     # No need for these right now
@@ -401,5 +544,6 @@ if __name__ == "__main__":
     # plot_parallel(z_arr, dist_para, ok)
     # plot_perp_thet(zs, theta_arr, dist_thet, ok)
     # plot_perp_phi(zs, phi_arr, dist_phi, ok)
-    # plot_total_perp(dists, theory_perps, dist_diffs)
-    circle(1)
+    plot_total_perp(analyts, theory_perps, dist_diffs)
+    # plot_polar(1)
+    # dist_comp()
