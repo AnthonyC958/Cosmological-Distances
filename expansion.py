@@ -176,8 +176,8 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
     theta_dist = dist2 - dist1
     phi_dist = perp_phi(matter_dp, lambda_dp, zs_array, z_contour, theta2, phis_array)  # array of phi distances, so
     # D_perp is a function of phi
-    dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2 - 2 * theta_dist * phi_dist * np.cos(np.arccos(np.sin(theta1) *
-                        np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2))))
+    angles_btw = np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2))
+    dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2 - 2 * theta_dist * phi_dist * np.cos(angles_btw))
     # dist_perp = np.sqrt(theta_dist ** 2 + phi_dist ** 2)
 
     # # Find analytical value
@@ -187,20 +187,12 @@ def total_perp(matter_dp, lambda_dp, zs_array, z_contour, phis_array, theta1, th
     analytical = radius * np.arccos(np.sin(theta1) * np.sin(theta2) * np.cos(phis_array) + np.cos(theta1)
                                     * np.cos(theta2))
 
-    # Find numerical line integral distance
-    pt1 = np.array([radius * np.sin(theta1), 0.0, radius * np.cos(theta1)])
-    pt3 = np.array([radius * np.sin(theta2), 0.0, radius * np.cos(theta2)])
-    td = np.linalg.norm(pt3-pt1)
-    pt2 = [radius * np.sin(theta2)*np.cos(phis_array), radius * np.sin(theta2)*np.sin(phis_array),
-           radius * np.cos(theta2)]
-    pd = np.linalg.norm(pt2-pt3)
-    pdist = np.sqrt((pt1[0] - pt2[0])**2 + pt2[1]**2 + (pt1[2] - pt2[2])**2)
-    proper = np.sqrt(td**2 + pd**2 - 2 * td * pd * np.cos(np.sin(theta1) *
-                        np.sin(theta2) * np.cos(phis_array) + np.cos(theta1) * np.cos(theta2)))
+    # Find Liske's approximated distance
+    liske_dist = radius * np.sqrt(2 - 2 * np.cos(angles_btw))
 
-    difference = analytical - dist_perp
+    difference = analytical - liske_dist
     norm_diff = difference/analytical
-    return dist_perp, proper, difference, norm_diff, analytical
+    return dist_perp, liske_dist, difference, norm_diff, analytical
 
 
 def get_line_integrand_total(lambda_val, r1, r2, theta1, theta2, phi1, phi2):
@@ -420,7 +412,7 @@ def dist_comp():
         alpha[m] = np.linspace(0, theta[m], 1001)
         R2[m] = rtheta(k[m], alpha[m], theta0[m])
         L[m] = liske(R1, R2[m], alpha[m])
-        plt.plot(np.linspace(0, 1, 1001), L[m], linestyle='--', color=col[m]) #, label=f"Liske $\\theta_0 = "
+        plt.plot(alpha[m], L[m], linestyle='--', color=col[m]) #, label=f"Liske $\\theta_0 = "
                                                                                     # f"{int(np.rad2deg(theta0[m]))}"
                                                                                     # f"^\circ$")
     plt.xlabel("s", fontsize=16)
@@ -493,8 +485,8 @@ if __name__ == "__main__":
 
     # Calculate the three total perpendicular distances
     z_radius = 1
-    theta_starts = np.array([0, 0, 15 * deg, 15 * deg, 30 * deg, 30 * deg])
-    theta_ends = np.array([5 * deg, 10 * deg, 20 * deg, 25 * deg, 35 * deg, 40 * deg])
+    theta_starts = np.array([0, 0, 15 * deg, 15 * deg, 30 * deg, 89.9 * deg])
+    theta_ends = np.array([5 * deg, 10 * deg, 20 * deg, 25 * deg, 35 * deg, 90.1 * deg])
     dists = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
         theta_starts.size, phi_arr.size)
     analyts = np.arange(theta_starts.size * phi_arr.size, dtype=np.float64).reshape(
@@ -544,6 +536,6 @@ if __name__ == "__main__":
     # plot_parallel(z_arr, dist_para, ok)
     # plot_perp_thet(zs, theta_arr, dist_thet, ok)
     # plot_perp_phi(zs, phi_arr, dist_phi, ok)
-    plot_total_perp(analyts, theory_perps, dist_diffs)
+    # plot_total_perp(analyts, theory_perps, dist_diffs)
     # plot_polar(1)
-    # dist_comp()
+    dist_comp()
