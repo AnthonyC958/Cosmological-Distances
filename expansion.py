@@ -3,6 +3,7 @@ import matplotlib, matplotlib.pyplot as plt
 import scipy.integrate as sp
 
 colours = ['C0', 'C1', 'C2', 'C3', 'C4', 'C9', 'C6', 'C7', 'C8', 'C5', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6']
+col = [[0, 0.8, 1], [1, 0.85, 0], [0, 1, 0.1], [1, 0.6, 0.7], [0.8, 0, 1], [0, 1, 1]]
 
 
 def get_h_inv(z_val, matter_dp, lambda_dp):
@@ -289,20 +290,27 @@ def polar(r, theta_range):
     geo = vecCalculate_circle_integral(theta_range, r)
     # geo = 2 * r * np.cos(theta_range/2) * np.tan(theta_range - theta_range/2)
 
-    return chord, arc, geo
+    norm_diff = (arc-geo)/geo
+
+    return chord, arc, geo, norm_diff
 
 
 def plot_polar(r):
     theta_range = np.linspace(np.longdouble(0), np.longdouble(np.pi), 1001)
-    chord, arc, geo = polar(r, theta_range)
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    chord, arc, geo, nd = polar(r, theta_range)
+    ax = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
+    ax.set_ylabel("Length", fontsize=16)
+    ax2 = plt.subplot2grid((4, 1), (3, 0))
+    ax2.set_xlabel("$\\theta$", fontsize=16)
+    ax2.set_ylabel("Norm. Diff.", fontsize=16)
+    ax.tick_params(labelbottom=False)
+    ax2.plot(theta_range, np.linspace(0, 0, 1001), linestyle="--", color="k")
     ax.plot(theta_range[:-5], geo[:-5], label="Geodesic distance")
     ax.plot(theta_range, chord, label="Chord length", linestyle='--')
     ax.plot(theta_range, arc, label="Arc length")
+    ax2.plot(theta_range[:-5], nd[:-5])
 
     ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.6, 0.7), fontsize=12)
-    ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("Length", fontsize=16)
     # ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
     # fig.savefig("parallel.pdf", bbox_inches="tight")
@@ -354,19 +362,31 @@ def liske_distances():
     L11 = liske(chi1[0], chi2[0], alpha)
     L12 = liske(chi1[0], chi2[1], alpha)
     L13 = liske(chi1[0], chi2[2], alpha)
+    R11 = roukema(chi1[0], chi2[0], alpha)
+    R12 = roukema(chi1[0], chi2[1], alpha)
+    R13 = roukema(chi1[0], chi2[2], alpha)
 
     # Second
     L21 = liske(chi1[1], chi2[3], alpha)
     L22 = liske(chi1[1], chi2[4], alpha)
     L23 = liske(chi1[1], chi2[5], alpha)
+    R21 = roukema(chi1[1], chi2[3], alpha)
+    R22 = roukema(chi1[1], chi2[4], alpha)
+    R23 = roukema(chi1[1], chi2[5], alpha)
 
     plt.plot(alpha, L11, color=colours[0], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[0]}")
     plt.plot(alpha, L12, color=colours[1], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[1]}")
     plt.plot(alpha, L13, color=colours[2], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[2]}")
+    plt.plot(alpha, R11, color=col[0], marker='o', markevery=50, linestyle='none', markersize=4)
+    plt.plot(alpha, R12, color=col[1], marker='o', markevery=50, linestyle='none', markersize=4)
+    plt.plot(alpha, R13, color=col[2], marker='o', markevery=50, linestyle='none', markersize=4)
 
     plt.plot(alpha, L21, color=colours[3], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[3]}")
     plt.plot(alpha, L22, color=colours[4], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[4]}")
     plt.plot(alpha, L23, color=colours[5], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[5]}")
+    plt.plot(alpha, R21, color=col[3], marker='o', markevery=50, linestyle='none', markersize=4)
+    plt.plot(alpha, R22, color=col[4], marker='o', markevery=50, linestyle='none', markersize=4)
+    plt.plot(alpha, R23, color=col[5], marker='o', markevery=50, linestyle='none', markersize=4)
     plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1))
     plt.xlabel("$\\alpha$", fontsize=16)
     plt.ylabel("$R_0\chi_{12}$ (h$^{-1}$Gpc)", fontsize=16)
@@ -412,7 +432,8 @@ def dist_comp():
         alpha[m] = np.linspace(0, theta[m], 1001)
         R2[m] = rtheta(k[m], alpha[m], theta0[m])
         L[m] = liske(R1, R2[m], alpha[m])
-        plt.plot(alpha[m], L[m], linestyle='--', color=col[m]) #, label=f"Liske $\\theta_0 = "
+        plt.plot(np.linspace(0, 1, 1001), L[m], linestyle='none', color=col[m], marker='o', markersize=4,
+                 markevery=50) #, label=f"Liske $\\theta_0 = "
                                                                                     # f"{int(np.rad2deg(theta0[m]))}"
                                                                                     # f"^\circ$")
     plt.xlabel("s", fontsize=16)
@@ -531,6 +552,18 @@ if __name__ == "__main__":
     plt.figtext(0.466, 0.648, f"k = {k}", ha='right', va='bottom', weight='roman', fontsize=12)
     plt.show()
 
+    ang_diam_dist = parallel(om, ol, z_arr[:350])/(1+z_arr[:350])
+    arc = 0.15/ang_diam_dist
+    chord = 2*np.arcsin(0.15/2/ang_diam_dist)
+    nd = (arc-chord)/chord
+    # plt.plot(z_arr[:350], arc)
+    plt.plot(z_arr[:350], chord)
+    # plt.plot(z_arr[:350], nd)
+    plt.plot(np.linspace(0.1, 0.1, 2), np.linspace(0, 1.25, 2), color='k', linestyle='--')
+    plt.ylim(0, 1.25)
+    plt.ylabel("$\\theta$", fontsize=16)
+    plt.xlabel("z", fontsize=16)
+    plt.show()
     # No need for these right now
     # numerical_check(om, ol, z_arr, 0.5)
     # plot_parallel(z_arr, dist_para, ok)
@@ -538,4 +571,5 @@ if __name__ == "__main__":
     # plot_perp_phi(zs, phi_arr, dist_phi, ok)
     # plot_total_perp(analyts, theory_perps, dist_diffs)
     # plot_polar(1)
-    dist_comp()
+    # dist_comp()
+    # liske_distances()
