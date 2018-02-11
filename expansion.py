@@ -47,12 +47,13 @@ def numerical_check(matter_dp, lambda_dp, zs_array, q0):
     # Liske_dist = -c / H0 / q0**2 / (1+zs_array) * (q0 * z + (q0 - 1) * (np.sqrt(1 + 2 * q0 * zs_array) - 1))
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(zs_array, test_dist, label="Numerical")
-    ax.plot(zs_array, analytical_dist, label="Analytical", linestyle="--")
+    ax.plot(zs_array, test_dist, label="Numerical", linewidth=2)
+    ax.plot(zs_array, analytical_dist, label="Analytical", linestyle="--", linewidth=2)
     # ax.plot(zs_array, Liske_dist, label="Liske")  # Liske distance doesn't match
-    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.7, 0.8))
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(0.5, 0.8), fontsize=16)
     ax.set_xlabel("$z$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
+    ax.tick_params(axis='both', which='major', labelsize=12)
     # ax.set_title("Numerical Versus Analytical Solution", fontsize=20)
     # fig.savefig("analytical_check.pdf", bbox_inches="tight")
     plt.show()
@@ -96,14 +97,15 @@ def plot_perp_thet(z_contours, thetas_array, dist, curvature):
     ax.set_xlabel("$\\theta$", fontsize=16)
     ax.set_ylabel("$R_0\chi$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
-        ax.plot(thetas_array, dist[num], label=f"$z={contour}$", color=colours[num])
-    ax.legend(loc="upper left", frameon=False, fontsize=12)  # ,bbox_to_anchor=(0, 0.5))
+        ax.plot(thetas_array, dist[num], label=f"$z={contour}$", color=colours[num], linewidth=2)
+    ax.legend(loc="upper left", frameon=False, fontsize=16)  # ,bbox_to_anchor=(0, 0.5))
     # if curvature == 0:
     #     ax.set_title("$\\theta$ Perpendicular Distance (Flat Space)", fontsize=20)
     # elif curvature < 0:
     #     ax.set_title("$\\theta$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
     # else:
     #     ax.set_title("$\\theta$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
     # fig.savefig("theta.pdf", bbox_inches="tight")
 
@@ -114,16 +116,17 @@ def plot_perp_phi(z_contours, phis_array, dists, curvature):
     ax.set_xlabel("$\\phi$", fontsize=16)
     ax.set_ylabel("$R_0\chi\sin\\theta$ (h$^{-1}$Gpc)", fontsize=16)
     for num, contour in enumerate(z_contours, start=0):
-        ax.plot(phis_array, dists[0][num], label=f"$z={contour}$", color=colours[num])
-    ax.legend(loc="upper left", frameon=False, fontsize=12)  # ,bbox_to_anchor=(0, 0.5))
+        ax.plot(phis_array, dists[0][num], label=f"$z={contour}$", color=colours[num], linewidth=2)
+    ax.legend(loc="upper left", frameon=False, fontsize=16)  # ,bbox_to_anchor=(0, 0.5))
     for num, contour in enumerate(z_contours, start=0):
-        ax.plot(phis_array, dists[1][num], label=f"$z={contour}$", color=colours[num], linestyle="--")
+        ax.plot(phis_array, dists[1][num], label=f"$z={contour}$", color=colours[num], linestyle="--", linewidth=2)
     # if curvature == 0:
     #     ax.set_title("$\\phi$ Perpendicular Distance (Flat Space)", fontsize=20)
     # elif curvature < 0:
     #     ax.set_title("$\\phi$ Perpendicular Distance (Negative Curved Space)", fontsize=20)
     # else:
     #     ax.set_title("$\\phi$ Perpendicular Distance (Positive Curved Space)", fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
     # fig.savefig("phi.pdf", bbox_inches="tight")
 
@@ -304,16 +307,18 @@ def plot_polar(r):
     ax2.set_xlabel("$\\theta$", fontsize=16)
     ax2.set_ylabel("Norm. Diff.", fontsize=16)
     ax.tick_params(labelbottom=False)
-    ax2.plot(theta_range, np.linspace(0, 0, 1001), linestyle="--", color="k")
-    ax.plot(theta_range[:-5], geo[:-5], label="Geodesic distance")
-    ax.plot(theta_range, chord, label="Chord length", linestyle='--')
-    ax.plot(theta_range, arc, label="Arc length")
-    ax2.plot(theta_range[:-5], nd[:-5])
+    ax2.plot(theta_range, np.linspace(0, 0, 1001), linestyle="--", color="k", linewidth=2)
+    ax.plot(theta_range[:-5], geo[:-5], label="Geodesic distance", linewidth=2)
+    ax.plot(theta_range, chord, label="Chord length", linestyle='--', linewidth=2)
+    ax.plot(theta_range, arc, label="Arc length", linewidth=2)
+    ax2.plot(theta_range[:-5], nd[:-5], linewidth=2)
 
-    ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.6, 0.7), fontsize=12)
+    ax.legend(loc="lower right", frameon=False, bbox_to_anchor=(0.6, 0.5), fontsize=16)
     ax.set_ylabel("Length", fontsize=16)
     # ax.set_title("Comparison of Distance Measures in Polar Co-ordinates", fontsize=20)
     # fig.savefig("parallel.pdf", bbox_inches="tight")
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax2.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
 
 
@@ -374,22 +379,23 @@ def liske_distances():
     R22 = roukema(chi1[1], chi2[4], alpha)
     R23 = roukema(chi1[1], chi2[5], alpha)
 
-    plt.plot(alpha, L11, color=colours[0], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[0]}")
-    plt.plot(alpha, L12, color=colours[1], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[1]}")
-    plt.plot(alpha, L13, color=colours[2], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[2]}")
+    plt.plot(alpha, L11, color=colours[0], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[0]}", linewidth=2)
+    plt.plot(alpha, L12, color=colours[1], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[1]}", linewidth=2)
+    plt.plot(alpha, L13, color=colours[2], label=f"$R_0\chi_1$ = {chi1[0]}, $R_0\chi_2$ = {chi2[2]}", linewidth=2)
     plt.plot(alpha, R11, color=col[0], marker='o', markevery=50, linestyle='none', markersize=4)
     plt.plot(alpha, R12, color=col[1], marker='o', markevery=50, linestyle='none', markersize=4)
     plt.plot(alpha, R13, color=col[2], marker='o', markevery=50, linestyle='none', markersize=4)
 
-    plt.plot(alpha, L21, color=colours[3], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[3]}")
-    plt.plot(alpha, L22, color=colours[4], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[4]}")
-    plt.plot(alpha, L23, color=colours[5], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[5]}")
+    plt.plot(alpha, L21, color=colours[3], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[3]}", linewidth=2)
+    plt.plot(alpha, L22, color=colours[4], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[4]}", linewidth=2)
+    plt.plot(alpha, L23, color=colours[5], label=f"$R_0\chi_1$ = {chi1[1]}, $R_0\chi_2$ = {chi2[5]}", linewidth=2)
     plt.plot(alpha, R21, color=col[3], marker='o', markevery=50, linestyle='none', markersize=4)
     plt.plot(alpha, R22, color=col[4], marker='o', markevery=50, linestyle='none', markersize=4)
     plt.plot(alpha, R23, color=col[5], marker='o', markevery=50, linestyle='none', markersize=4)
-    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1))
-    plt.xlabel("$\\alpha$", fontsize=16)
-    plt.ylabel("$R_0\chi_{12}$ (h$^{-1}$Gpc)", fontsize=16)
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=16)
+    plt.xlabel("$\\alpha$", fontsize=18)
+    plt.ylabel("$R_0\chi_{12}$ (h$^{-1}$Gpc)", fontsize=18)
+    plt.tick_params(axis='both', which='major', labelsize=14)
     plt.show()
 
 
@@ -418,11 +424,12 @@ def dist_comp():
                    np.sqrt(R1**2 + s[3][-1]**2 + 2*R1*s[3][-1]*np.cos(theta0[3]+np.pi/2))
                    ])
 
-    theta = np.array([np.arccos(R1 / R2[0]),
-                     np.arccos((R1 + s[1][-1] * np.cos(theta0[1]+np.pi/2)) / R2[1]),
-                     np.arccos((R1 - s[2][-1] * np.cos(theta0[2])) / R2[2]),
-                     np.arccos((R1 + s[3][-1] * np.cos(theta0[3]+np.pi/2)) / R2[3])
-                      ])
+    theta = theta2
+    # theta = np.array([np.arccos(R1 / R2[0]),
+    #                  np.arccos((R1 + s[1][-1] * np.cos(theta0[1]+np.pi/2)) / R2[1]),
+    #                  np.arccos((R1 - s[2][-1] * np.cos(theta0[2])) / R2[2]),
+    #                  np.arccos((R1 + s[3][-1] * np.cos(theta0[3]+np.pi/2)) / R2[3])
+    #                   ])
 
     L = np.arange(1001*4, dtype=np.float64).reshape(4, 1001)
     R2 = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
@@ -438,8 +445,57 @@ def dist_comp():
                                                                                     # f"^\circ$")
     plt.xlabel("s", fontsize=16)
     plt.ylabel("Distance", fontsize=16)
-    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=12)
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=16)
+    plt.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
+
+
+def diff_radius():
+    dtheta = np.array([0.1, 0.3, 0.6, 0.8])
+    dr = np.array([0.5, 1, 2.5, 4])
+    r1 = 1
+    rarr = np.linspace(0.5, 4, 1001)
+    dtharr = np.linspace(0, np.pi, 1001)
+
+    approxt = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    geot = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    approxr = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    geor = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    ndt = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+    ndr = np.arange(1001 * 4, dtype=np.float64).reshape(4, 1001)
+
+    ax = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
+    ax2 = plt.subplot2grid((4, 1), (3, 0))
+
+    ax.set_ylabel("Distance", fontsize=16)
+    ax2.set_xlabel("$\\theta$", fontsize=16)
+    ax2.set_ylabel("Norm. Diff.", fontsize=16)
+    ax.tick_params(labelbottom=False)
+
+    for counter in [0, 1, 2, 3]:
+        approxt[counter] = np.sqrt(rarr ** 2 + r1 ** 2 * dtheta[counter] ** 2)
+        geot[counter] = np.sqrt(2 * r1 ** 2 * (1 - np.cos(dtheta[counter])) + rarr ** 2 + 2 * r1 * rarr *
+                                (1 - np.cos(dtheta[counter])))
+
+        approxr[counter] = np.sqrt(dr[counter] ** 2 + r1 ** 2 * dtharr ** 2)
+        # geor[counter] = np.sqrt(2 * r1 ** 2 * (1 - np.cos(dtharr)) + dr[counter] ** 2 + 2 * r1 * dr[counter] *
+        #                         (1 - np.cos(dtharr)))
+        geor[counter] = np.sqrt(r1**2 + (r1 + dr[counter])**2 - 2*r1*(r1+dr[counter])*np.cos(dtharr))
+        ndt[counter] = (approxt[counter]-geot[counter])/geot[counter]
+        ndr[counter] = (approxr[counter]-geor[counter])/geor[counter]
+
+        ax.plot(dtharr, geor[counter], label=f"$\Delta R = ${dr[counter]}", linewidth=2, color=colours[counter])
+        ax.plot(dtharr, approxr[counter], linestyle='--', linewidth=2, color=colours[counter])
+        ax2.plot(dtharr, ndr[counter], linewidth=2, color=colours[counter])
+
+    ax2.plot(dtharr, np.linspace(0, 0, 1001), linestyle="--", color="k", linewidth=2)
+
+    ax.legend(loc="upper left", frameon=False, bbox_to_anchor=(-0.02, 1.05), fontsize=16)
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax2.tick_params(axis='both', which='major', labelsize=12)
+    plt.show()
+
+
 
 
 # Geodesics on the surface of a sphere #
@@ -491,7 +547,7 @@ if __name__ == "__main__":
     dist_para = parallel(om, ol, z_arr)
 
     # Calculate theta perpendicular distance
-    zs = np.linspace(z_lo + z_hi / 5, z_hi, int((z_nstep - 1) / 20))
+    zs = np.array([3.0, 6.0, 9.0, 12.0, 15.0])
     dist_thet = np.arange(zs.size * z_arr.size, dtype=np.float64).reshape(zs.size, z_arr.size)
     for i, z in enumerate(zs, start=0):
         dist_thet[i][:] = perp_thet(om, ol, z_arr, z, theta_arr)
@@ -529,42 +585,49 @@ if __name__ == "__main__":
         r, theta1 = geodesic_equations(larr, k, theta0[k-1])
         x = r * np.cos(theta1)
         y = r * np.sin(theta1)
-        plt.plot(x, y, color=colours[k-1], label=f"k = {k}, $\\theta_0$ = $\pi$/{divs[k-1]}")
-        plt.plot([0, k*np.cos(theta0[k-1])], [0, k*np.sin(theta0[k-1])], color=colours[k-1], linestyle=':')
+        plt.plot(x, y, color=colours[k-1], label=f"k, $\\theta_0$ = {k}, $\pi$/{divs[k-1]}", linewidth=2)
+        plt.plot([0, k*np.cos(theta0[k-1])], [0, k*np.sin(theta0[k-1])], color=colours[k-1], linestyle=':', linewidth=2)
         plt.plot(x[25:51], np.sqrt(k ** 2 - x[25:51] ** 2), color=colours[k - 1],
-                 linestyle=':')
+                 linestyle=':', linewidth=2)
         plt.plot(x[51:-5], np.sqrt(k ** 2 - x[51:-5] ** 2), color=colours[k - 1],
-                 linestyle=':')
+                 linestyle=':', linewidth=2)
     plt.ylabel("y", fontsize=16)
     plt.xlabel("x", fontsize=16)
     plt.axis('equal')
-    plt.legend(loc="upper left", frameon=False, bbox_to_anchor=(0, 1), fontsize=12)
+    plt.legend(loc="upper left", frameon=False, bbox_to_anchor=(0, 1), fontsize=16)
+    plt.tick_params(axis='both', which='major', labelsize=12)
     # plt.show()
 
     # r_theta2 = rtheta(1, th_arr * theta0[0] * 2, theta0[2])
     # plt.plot(th_arr * theta0[0] * 2, r_theta2, color=colours[3])
     for c, k in enumerate([1, 1, 1]):
         r_theta = rtheta(k, th_arr*theta0[c]*2, theta0[c])
-        plt.plot(th_arr*theta0[c]*2, r_theta, color=colours[c], label=f"$\\theta_0$ = $\pi$/{divs[c]}")
-    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=12)
+        plt.plot(th_arr*theta0[c]*2, r_theta, color=colours[c], label=f"$\\theta_0$ = $\pi$/{divs[c]}", linewidth=2)
+    plt.legend(loc="upper right", frameon=False, bbox_to_anchor=(0.5, 1), fontsize=16)
     plt.xlabel("$\\theta$", fontsize=16)
     plt.ylabel("$r(\\theta)$", fontsize=16)
-    plt.figtext(0.466, 0.648, f"k = {k}", ha='right', va='bottom', weight='roman', fontsize=12)
+    plt.figtext(0.447, 0.558, f"k = {k}", ha='right', va='bottom', weight='roman', fontsize=16)
+    plt.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
 
-    ang_diam_dist = parallel(om, ol, z_arr[:350])/(1+z_arr[:350])
-    arc = 0.15/ang_diam_dist
-    chord = 2*np.arcsin(0.15/2/ang_diam_dist)
+    num_pts = 100
+    ang_diam_dist = parallel(om, ol, z_arr[:num_pts])/(1+z_arr[:num_pts])
+    arc = 0.1533/ang_diam_dist
+    chord = 2*np.arcsin(0.1533/2/ang_diam_dist)
     nd = (arc-chord)/chord
-    # plt.plot(z_arr[:350], arc)
-    plt.plot(z_arr[:350], chord)
-    # plt.plot(z_arr[:350], nd)
-    plt.plot(np.linspace(0.1, 0.1, 2), np.linspace(0, 1.25, 2), color='k', linestyle='--')
+    # plt.plot(z_arr[:num_pts], arc)
+    plt.plot(z_arr[:num_pts], chord)
+    # plt.plot(z_arr[:num_pts], nd)
+    plt.plot(np.linspace(0.1, 0.1, 2), np.linspace(0, 1.25, 2), linestyle='--', color=[0.5, 0.5, 0.5])
+    plt.plot(np.linspace(0.44, 0.44, 2), np.linspace(0, 1.25, 2), linestyle='-.', color=[0.5, 0.5, 0.5])
+    plt.plot(np.linspace(0.6, 0.6, 2), np.linspace(0, 1.25, 2), linestyle='-.', color=[0.5, 0.5, 0.5])
+    plt.plot(np.linspace(0.73, 0.73, 2), np.linspace(0, 1.25, 2), linestyle='-.', color=[0.5, 0.5, 0.5])
     plt.ylim(0, 1.25)
     plt.ylabel("$\\theta$", fontsize=16)
     plt.xlabel("z", fontsize=16)
+    plt.tick_params(axis='both', which='major', labelsize=12)
     plt.show()
-    # No need for these right now
+
     # numerical_check(om, ol, z_arr, 0.5)
     # plot_parallel(z_arr, dist_para, ok)
     # plot_perp_thet(zs, theta_arr, dist_thet, ok)
@@ -573,3 +636,4 @@ if __name__ == "__main__":
     # plot_polar(1)
     # dist_comp()
     # liske_distances()
+    diff_radius()
